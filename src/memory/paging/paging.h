@@ -13,6 +13,11 @@
 #define PAGING_TOTAL_ENTRIES_PER_TABLE 1024
 #define PAGING_PAGE_SIZE 4096
 
+#include <stdbool.h>
+
+int paging_set(uint32_t* directory, void* virt, uint32_t val);
+bool paging_is_aligned(void* addr);
+
 struct paging_4gb_chunk
 {
     uint32_t* directory_entry;
