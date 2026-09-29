@@ -6,6 +6,7 @@
 #include "memory/heap/kheap.h"
 #include "memory/paging/paging.h"
 #include "disk/disk.h"
+#include "string/string.h"
 
 static struct paging_4gb_chunk* kernel_chunk = 0;
 
@@ -56,16 +57,6 @@ void terminal_initialize()
     }
 }
 
-size_t strlen(const char* str)
-{
-    size_t len = 0;
-    while (str[len])
-    {
-        len++;
-    }
-
-    return len;
-}
 
 void print(const char* str)
 {
