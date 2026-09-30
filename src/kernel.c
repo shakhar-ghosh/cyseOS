@@ -7,6 +7,7 @@
 #include "memory/paging/paging.h"
 #include "disk/disk.h"
 #include "string/string.h"
+#include "fs/pparser.h"
 
 static struct paging_4gb_chunk* kernel_chunk = 0;
 
@@ -93,4 +94,15 @@ void kernel_main()
 
     // Enable system interrupts
     enable_interrupts();
+
+    struct path_root* root_path = pathparser_parse("0:/bin/shell.exe", NULL);
+    if (root_path)
+    {
+        print("Parsed path successfully!\n");
+        pathparser_free(root_path);
+    }
+    else
+    {
+        print("Failed to parse path!\n");
+    }
 }
