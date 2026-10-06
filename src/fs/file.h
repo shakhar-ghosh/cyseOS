@@ -41,6 +41,8 @@ struct file_stat
 
 typedef int (*FS_STAT_FUNCTION) (struct disk* disk, void* private, struct file_stat* stat);
 
+typedef int (*FS_CLOSE_FUNCTION) (void* private);
+
 struct filesystem {
     FS_RESOLVE_FUNCTION resolve;
     FS_OPEN_FUNCTION open;
@@ -48,6 +50,7 @@ struct filesystem {
     FS_READ_FUNCTION read;
     FS_SEEK_FUNCTION seek;
     FS_STAT_FUNCTION stat;
+    FS_CLOSE_FUNCTION close;
 };
 
 struct file_descriptor {
@@ -65,5 +68,6 @@ FILE_MODE file_get_mode_by_string(const char* mode_str);
 int fread(void* ptr, uint32_t size, uint32_t nmemb, int fd);
 int fseek(int fd, int offset, FILE_SEEK_MODE whence);
 int fstat(int fd, struct file_stat* stat);
+int fclose(int fd);
 
 #endif
