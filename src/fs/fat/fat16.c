@@ -127,6 +127,7 @@ struct fat_file_descriptor
 int fat16_resolve(struct disk* disk);
 void* fat16_open(struct disk* disk, struct path_part* path, FILE_MODE mode);
 int fat16_read(struct disk* disk, void* descriptor, uint32_t size, uint32_t nmemb, char* out_ptr);
+int fat16_seek(void* private, uint32_t offset, FILE_SEEK_MODE seek_mode);
 
 struct fat_item* fat16_get_directory_entry(struct disk* disk, struct path_part* path);
 
@@ -134,7 +135,8 @@ struct filesystem fat16_fs =
 {
     .resolve = fat16_resolve,
     .open = fat16_open,
-    .read = fat16_read
+    .read = fat16_read,
+    .seek = fat16_seek
 };
 
 struct filesystem* fat16_init()
@@ -417,7 +419,7 @@ static int fat16_read_internal_from_stream(struct disk* disk, struct disk_stream
     }
     int offset_from_cluster = offset % size_of_cluster_bytes;
     int starting_sector = fat16_cluster_to_sector(private, cluster_to_use);
-    int starting_pos = (starting_sector * disk->sector_size) * offset_from_cluster;
+    int starting_pos = (starting_sector * disk->sector_size) + offset_from_cluster;
     int total_to_read = total > size_of_cluster_bytes ? size_of_cluster_bytes : total;
     res = diskstreamer_seek(stream, starting_pos);
     if (res != PEACHOS_ALL_OK)
@@ -581,6 +583,41 @@ int fat16_read(struct disk* disk, void* descriptor, uint32_t size, uint32_t nmem
         offset += size;
     }
     res = nmemb;
+out:
+    return res;
+}
+
+int fat16_seek(void* private, uint32_t offset, FILE_SEEK_MODE seek_mode)
+{
+    int res = 0;
+    struct fat_file_descriptor* desc = private;
+    struct fat_item* desc_item = desc->item;
+    if (desc_item->type != FAT_ITEM_TYPE_FILE)
+    {
+        res = -EINVARG;
+        goto out;
+    }
+    struct fat_directory_item* ritem = desc_item->item;
+    if (offset >= ritem->filesize)
+    {
+        res = -EIO;
+        goto out;
+    }
+    switch (seek_mode)
+    {
+        case SEEK_SET:
+            desc->pos = offset;
+            break;
+        case SEEK_END:
+            res = -EUNIMP;
+            break;
+        case SEEK_CUR:
+            desc->pos += offset;
+            break;
+        default:
+            res = -EINVARG;
+            break;
+    }
 out:
     return res;
 }
