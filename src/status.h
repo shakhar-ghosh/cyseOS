@@ -8,4 +8,6 @@
 
 #define EBADPATH 4
 
+#define EFSNOTUS 5
+
 #endif

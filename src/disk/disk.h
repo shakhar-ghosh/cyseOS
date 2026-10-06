@@ -8,9 +8,11 @@ typedef unsigned int PEACHOS_DISK_TYPE;
 
 struct disk
 {
+    int id;
     PEACHOS_DISK_TYPE type;
     int sector_size;
     struct filesystem* filesystem;
+    struct fat_private* fs_private;
 };
 
 void disk_search_and_init();
