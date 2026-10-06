@@ -166,3 +166,22 @@ FILE_MODE file_get_mode_by_string(const char* str)
     }
     return mode;
 }
+
+int fread(void* ptr, uint32_t size, uint32_t nmemb, int fd)
+{
+    int res = 0;
+    if (size == 0 || nmemb == 0 || fd < 1)
+    {
+        res = -EINVARG;
+        goto out;
+    }
+    struct file_descriptor* desc = file_get_descriptor(fd);
+    if (!desc)
+    {
+        res = -EINVARG;
+        goto out;
+    }
+    res = desc->filesystem->read(desc->disk, desc->private, size, nmemb, (char*) ptr);
+out:
+    return res;
+}
