@@ -98,15 +98,11 @@ void kernel_main()
 
     // Enable system interrupts
     enable_interrupts();
+    int fd = fopen("0:/hello.txt", "r");
+    if (fd)
+    {
+        print("We opened hello.txt\n");
+    }
+    while(1) {} 
 
-    struct path_root* root_path = pathparser_parse("0:/bin/shell.exe", NULL);
-    if (root_path)
-    {
-        print("Parsed path successfully!\n");
-        pathparser_free(root_path);
-    }
-    else
-    {
-        print("Failed to parse path!\n");
-    }
 }
